@@ -25,12 +25,18 @@ int main() {
 				memset(buf, '\0', sizeof(buf)); // Clears buffer
 				scanf("%s", &buf);
 				acct_creation_loop = 0;
-				if (buf[0] == 'Y' || buf[0] == 'y') {
+				if (buf[0] == 'Y' || buf[0] == 'y') { 
 					printf("Enter the name of the account: ");
+					memset(acct_name, '\0', sizeof(acct_name)); // Clears buffer
+					scanf("%s", &acct_name); 
+					printf("Enter the EIN of the account: ");
+					memset(acct_name, '\0', sizeof(acct_name)); // Clears buffer
+					scanf("%s", &acct_name);
+					printf("Enter the address of the account: ");
 					memset(acct_name, '\0', sizeof(acct_name)); // Clears buffer
 					scanf("%s", &acct_name);
 				}
-				else if (buf[0] != 'N' || buf[0] != 'n') {
+				else if (buf[0] != 'N' && buf[0] != 'n') {
 					acct_creation_loop = 1;
 					printf("\"%s\" was not understood. Would you like to create that account? [Y/N]: ", buf);
 				}
