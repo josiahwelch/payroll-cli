@@ -12,6 +12,7 @@ int main() {
 
 	int acct_input_loop = 1;
 	int acct_creation_loop = 1;
+	int main_loop = 1;
 
 	while (acct_input_loop) {
 		printf("Input account id: ");
@@ -43,11 +44,17 @@ int main() {
 				}
 			}
 		}
-		printf("What do you want to do?\n\t1. Add new payroll batch\n\t2. Edit/print old payroll sheets.\n\t3. View statistics.\n[1, 2, 3, or 4]: ");
-		memset(buf, '\0', sizeof(buf)); // Clears buffer
-		scanf("%s", &buf);
-		if (buf[0] == '1') {
-			printf("yup\n");
+		while (main_loop) {
+			printf("What do you want to do?\n\t1. Add new payroll batch\n\t2. Edit/print old payroll sheets.\n\t3. View statistics.\n[1, 2, 3, or 4]: ");
+			memset(buf, '\0', sizeof(buf)); // Clears buffer
+			scanf("%s", &buf);
+			if (buf[0] == '1') {
+			} else if (buf[0] == '2') {
+			} else if (buf[0] == '3') {
+			} else if (buf[0] == '4') {
+			} else {
+				printf("\"%s\" was not understood. ", buf);
+			}
 		}
 	}
 }
