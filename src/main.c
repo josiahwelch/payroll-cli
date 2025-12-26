@@ -20,7 +20,8 @@ int main() {
 	char acct[16];
 	char acctName[32];
 	char acctEIN[9];
-	char acctAddr[128];
+	char acctAddr[68];
+	char acctAddress[128];
 
 	char buf[1];
 
@@ -28,11 +29,13 @@ int main() {
 	int acctCreationLoop = 1;
 	int mainLoop = 1;
 
+	struct Employee acctEmployees[128];
+
 	while (acctInputLoop) {
 		printf("Input account id: ");
 		memset(acct, '\0', sizeof(acct)); // Clears buffer
 		scanf("%s", &acct);
-		sprintf(acctAddr, "~/.config/payroll-cli/db/%s.cfg");
+		sprintf(acctAddr, "~/.config/payroll-cli/db/%s/acct.dat");
 		f_ptr = fopen(acctAddr, "r");
 		if (f_ptr == NULL) {
 			printf("That account was not found! Would you like to create it? [Y/N]: ");
@@ -49,8 +52,8 @@ int main() {
 					memset(acctEIN, '\0', sizeof(acctEIN)); // Clears buffer
 					scanf("%s", &acctEIN);
 					printf("Enter the address of the account: ");
-					memset(acctAddr, '\0', sizeof(acctAddr)); // Clears buffer
-					scanf("%s", &acctAddr);
+					memset(acctAddress, '\0', sizeof(acctAddress)); // Clears buffer
+					scanf("%s", &acctAddress);
 				}
 				else if (buf[0] != 'N' && buf[0] != 'n') {
 					acctCreationLoop = 1;
