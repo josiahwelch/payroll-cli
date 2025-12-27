@@ -9,11 +9,18 @@ enum EmployeeType {
 struct Employee {
 	char id[16];
 	char name[32];
-	char ssn[9];
+	char ssn[10];
 	char address[128];
 	float pay;
 	enum EmployeeType employeeType;
 };
+
+struct Account {
+	char id[16];
+	char name[32];
+	char EIN[10];
+	char address[128];
+}
 
 int main() {
 	FILE* f_ptr;
@@ -48,7 +55,7 @@ int main() {
 					printf("Enter the name of the account: ");
 					memset(acctName, '\0', sizeof(acctName)); // Clears buffer
 					scanf("%s", &acctName); 
-					printf("Enter the EIN of the account (DO NOT include the dash): ");
+					printf("Enter the EIN of the account (XX-XXXXXXX): ");
 					memset(acctEIN, '\0', sizeof(acctEIN)); // Clears buffer
 					scanf("%s", &acctEIN);
 					printf("Enter the address of the account: ");
