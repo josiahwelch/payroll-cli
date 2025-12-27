@@ -36,7 +36,7 @@ int main() {
 	int acctCreationLoop = 1;
 	int mainLoop = 1;
 
-	struct Employee acctEmployees[128];
+	struct Account account;
 
 	while (acctInputLoop) {
 		printf("Input account id: ");
