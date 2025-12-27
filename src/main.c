@@ -20,7 +20,7 @@ struct Account {
 	char name[32];
 	char EIN[10];
 	char address[128];
-}
+};
 
 int main() {
 	FILE* f_ptr;
@@ -55,12 +55,15 @@ int main() {
 					printf("Enter the name of the account: ");
 					memset(acctName, '\0', sizeof(acctName)); // Clears buffer
 					scanf("%s", &acctName); 
+					strcpy(account.name, acctName);
 					printf("Enter the EIN of the account (XX-XXXXXXX): ");
 					memset(acctEIN, '\0', sizeof(acctEIN)); // Clears buffer
 					scanf("%s", &acctEIN);
+					strcpy(account.EIN, acctEIN);
 					printf("Enter the address of the account: ");
 					memset(acctAddress, '\0', sizeof(acctAddress)); // Clears buffer
 					scanf("%s", &acctAddress);
+					strcpy(account.address, acctAddress);
 				}
 				else if (buf[0] != 'N' && buf[0] != 'n') {
 					acctCreationLoop = 1;
