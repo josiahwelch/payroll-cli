@@ -23,25 +23,11 @@ struct Account {
 	char address[128];
 };
 
-void getAccount(struct Account account, FILE *fPtr) {
-	char fDat[512];
-	char buf[256];
-	fgets(fDat, 128, fPtr);
-	char entries[256][6];
-	uint8_t argCount = 0;
-	uint16_t bufIndex = 0;
-	for (int i=0; fDat[i] != '\0'; i++) {
-		buf[bufIndex] = fDat[i];
-		if (fDat[i] == ';') {
-			strcpy(entries[argCount], buf);
-			memset(buf, '\0', sizeof(buf));
-			bufIndex = 0;
-		}
-		bufIndex++;
-	}
-	printf("%s", entries[0]);
+void getAccount(struct Account account, char* address) {
+	FILE* fPtr = fopen(address, "r");
+	fread(&account, sizeof(account), 1, fPtr);
+	fclose(fPtr);
 }
-
 
 int main() {
 	FILE* fPtr;
@@ -66,6 +52,8 @@ int main() {
 		sprintf(acctAddr, "~/.config/payroll-cli/db/%s/acct.dat");
 		fPtr = fopen(acctAddr, "r");
 		if (fPtr == NULL) {
+			fclose(fPtr);
+			free(fPtr);
 			printf("That account was not found! Would you like to create it? [Y/N]: ");
 			acctCreationLoop = 1;
 			while (acctCreationLoop) {
