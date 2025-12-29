@@ -23,16 +23,19 @@ struct Account {
 	char address[128];
 };
 
-void getAccount(struct Account* account, char* address) {
+// Checks to close the file
+void closeFile(FILE* fPtr) {if (fPtr != NULL) {fclose(fPtr);}}
+
+void getAccount(struct Account account, char* address) {
 	FILE* fPtr = fopen(address, "r");
-	fread(account, sizeof(account), 1, fPtr);
-	fclose(fPtr);
+	fread(&account, sizeof(account), 1, fPtr);
+	closeFile(fPtr);
 }
 
-void saveAccount(struct Account* account, char* address) {
+void saveAccount(struct Account account, char* address) {
 	FILE* fPtr = fopen(address, "w");
-	fwrite(account, sizeof(account), 1, fPtr);
-	fclose(fPtr);
+	fwrite(&account, sizeof(account), 1, fPtr);
+	closeFile(fPtr);
 }
 
 int main() {
@@ -40,7 +43,7 @@ int main() {
 	char acct[16];
 	char acctName[32];
 	char acctEIN[9];
-	char acctAddr[68];
+	char acctAddr[63];
 	char acctAddress[128];
 
 	char buf[1];
@@ -55,11 +58,10 @@ int main() {
 		printf("Input account id: ");
 		memset(acct, '\0', sizeof(acct)); // Clears buffer
 		scanf("%s", &acct);
-		sprintf(acctAddr, "~/.config/payroll-cli/db/%s/acct.dat");
+		sprintf(acctAddr, "data/%s.dat", acct);
 		fPtr = fopen(acctAddr, "r");
 		if (fPtr == NULL) {
-			fclose(fPtr);
-			free(fPtr);
+			closeFile(fPtr);
 			printf("That account was not found! Would you like to create it? [Y/N]: ");
 			acctCreationLoop = 1;
 			while (acctCreationLoop) {
@@ -86,13 +88,22 @@ int main() {
 				}
 			}
 		}
+		else {
+			closeFile(fPtr);
+			getAccount(account, acctAddr);
+		}
+		mainLoop = 1;
 		while (mainLoop) {
-			printf("What do you want to do?\n\t1. Add new payroll batch\n\t2. Edit/print old payroll sheets.\n\t3. View statistics.\n[1, 2, or 3]: ");
+			printf("What do you want to do?\n\t1. Add new payroll batch\n\t2. Edit/print old payroll sheets.\n\t3. View statistics.\n\t4. Save and quit.\n[1, 2, 3, or 4]: ");
 			memset(buf, '\0', sizeof(buf)); // Clears buffer
 			scanf("%s", &buf);
 			if (buf[0] == '1') {
 			} else if (buf[0] == '2') {
 			} else if (buf[0] == '3') {
+			} else if (buf[0] == '4') {
+				printf("Saving account...\n");
+				saveAccount(account, acctAddr);
+				mainLoop = 0;
 			} else {
 				printf("\"%s\" was not understood. ", buf);
 			}
