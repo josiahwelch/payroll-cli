@@ -23,9 +23,15 @@ struct Account {
 	char address[128];
 };
 
-void getAccount(struct Account account, char* address) {
+void getAccount(struct Account* account, char* address) {
 	FILE* fPtr = fopen(address, "r");
-	fread(&account, sizeof(account), 1, fPtr);
+	fread(account, sizeof(account), 1, fPtr);
+	fclose(fPtr);
+}
+
+void saveAccount(struct Account* account, char* address) {
+	FILE* fPtr = fopen(address, "w");
+	fwrite(account, sizeof(account), 1, fPtr);
 	fclose(fPtr);
 }
 
