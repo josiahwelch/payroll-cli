@@ -23,6 +23,18 @@ struct Account {
 	char address[128];
 };
 
+uint16_t getStrLen(char* string) {
+	int i;
+	for (i=0;string[i]!='\0';i++) {}
+	++i;
+	return i;
+}
+
+void removePayrollCLI(char* arg) {
+	uint16_t strLen = getStrLen(arg);
+	arg[strLen - 16] = '\0';
+}
+
 // Checks to close the file
 void closeFile(FILE* fPtr) {if (fPtr != NULL) {fclose(fPtr);}}
 
@@ -38,13 +50,14 @@ void saveAccount(struct Account account, char* address) {
 	closeFile(fPtr);
 }
 
-int main() {
+int main(int argc, char **argv) {
 	FILE* fPtr;
 	char acct[16];
 	char acctName[32];
 	char acctEIN[9];
-	char acctAddr[63];
+	char acctAddr[128];
 	char acctAddress[128];
+	char absLoc[128];
 
 	char buf[1];
 
@@ -54,11 +67,15 @@ int main() {
 
 	struct Account account;
 
+	// Sets absLoc
+	strcpy(absLoc, argv[0]);
+	removePayrollCLI(absLoc);
+
 	while (acctInputLoop) {
 		printf("Input account id: ");
 		memset(acct, '\0', sizeof(acct)); // Clears buffer
 		scanf("%s", &acct);
-		sprintf(acctAddr, "data/%s.dat", acct);
+		sprintf(acctAddr, "%s/data/%s.dat", absLoc, acct);
 		fPtr = fopen(acctAddr, "r");
 		if (fPtr == NULL) {
 			closeFile(fPtr);
