@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
 		}
 		mainLoop = 1;
 		while (mainLoop) {
-			printf("What do you want to do?\n\t1. Add new payroll batch\n\t2. Edit/print old payroll sheets.\n\t3. View statistics.\n\t4. Save and quit.\n[1, 2, 3, or 4]: ");
+			printf("What do you want to do?\n\t1. Add new payroll batch\n\t2. Edit/print old payroll sheets.\n\t3. View statistics.\n\t4. Save.\n\t5. Quit.\n[1, 2, 3, 4, or 5]: ");
 			memset(buf, '\0', sizeof(buf)); // Clears buffer
 			scanf("%s", &buf);
 			if (buf[0] == '1') {
