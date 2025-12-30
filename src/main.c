@@ -121,6 +121,9 @@ int main(int argc, char **argv) {
 				printf("Saving account...\n");
 				saveAccount(account, acctAddr);
 				mainLoop = 0;
+			} else if (buf[0] == '5') {
+				printf("Quitting...\n");
+				return 0;
 			} else {
 				printf("\"%s\" was not understood. ", buf);
 			}
