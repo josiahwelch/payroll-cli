@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 enum EmployeeType {
 	SALARY,
@@ -22,7 +23,18 @@ struct Account {
 	char EIN[10];
 	char address[128];
 	struct Employee employees[128];
+	uint8_t employeeCount = 0;
 };
+
+// I know this is inefficient, but I am too lazy to do anything but a brute-force approach
+struct Employee* getEmployee(struct Employee* employees, char* id) {
+	for (int i=0;i<employeeCount;i++) {
+		if (!strcmp(employees[i].id, id)) {
+			return employees[i];
+		}
+	}
+	return NULL;
+}
 
 uint16_t getStrLen(char* string) {
 	int i;
@@ -66,6 +78,7 @@ int main(int argc, char **argv) {
 	int acctCreationLoop = 1;
 	int mainLoop = 1;
 	int empLoop = 1;
+	int empCreationLoop = 1;
 
 	struct Account account;
 
@@ -122,8 +135,9 @@ int main(int argc, char **argv) {
 				empLoop = 1;
 				while (empLoop) {
 					printf("Enter the employee's ID (enter '?' to list all employees): ");
+					if
 					printf("Enter the employee's name: ");
-					printf("Enter the employee's SSN: ");
+					printf("Enter the employee's SSN (XXX-XXX-XXXX): ");
 
 			} else if (buf[0] == '4') {
 			} else if (buf[0] == '5') {
