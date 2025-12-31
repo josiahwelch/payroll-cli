@@ -10,7 +10,7 @@ enum EmployeeType {
 struct Employee {
 	char id[16];
 	char name[32];
-	char ssn[10];
+	char SSN[11];
 	char address[128];
 	float pay;
 	enum EmployeeType employeeType;
@@ -21,6 +21,7 @@ struct Account {
 	char name[32];
 	char EIN[10];
 	char address[128];
+	struct Employee employees[128];
 };
 
 uint16_t getStrLen(char* string) {
@@ -54,7 +55,7 @@ int main(int argc, char **argv) {
 	FILE* fPtr;
 	char acct[16];
 	char acctName[32];
-	char acctEIN[9];
+	char acctEIN[11];
 	char acctAddr[128];
 	char acctAddress[128];
 	char absLoc[128];
@@ -64,6 +65,7 @@ int main(int argc, char **argv) {
 	int acctInputLoop = 1;
 	int acctCreationLoop = 1;
 	int mainLoop = 1;
+	int empLoop = 1;
 
 	struct Account account;
 
@@ -111,17 +113,24 @@ int main(int argc, char **argv) {
 		}
 		mainLoop = 1;
 		while (mainLoop) {
-			printf("What do you want to do?\n\t1. Add new payroll batch\n\t2. Edit/print old payroll sheets.\n\t3. View statistics.\n\t4. Save.\n\t5. Quit.\n[1, 2, 3, 4, or 5]: ");
+			printf("What do you want to do?\n\t1. Add new payroll batch\n\t2. Edit/print old payroll sheets.\n\t3. Edit/add employees.\n\t4. View account info.\n\t5. Save and exit.\n\t6. Quit.\n[1, 2, 3, 4, 5, or 6]: ");
 			memset(buf, '\0', sizeof(buf)); // Clears buffer
 			scanf("%s", &buf);
 			if (buf[0] == '1') {
 			} else if (buf[0] == '2') {
 			} else if (buf[0] == '3') {
+				empLoop = 1;
+				while (empLoop) {
+					printf("Enter the employee's ID (enter '?' to list all employees): ");
+					printf("Enter the employee's name: ");
+					printf("Enter the employee's SSN: ");
+
 			} else if (buf[0] == '4') {
+			} else if (buf[0] == '5') {
 				printf("Saving account...\n");
 				saveAccount(account, acctAddr);
 				mainLoop = 0;
-			} else if (buf[0] == '5') {
+			} else if (buf[0] == '6') {
 				printf("Quitting...\n");
 				return 0;
 			} else {
