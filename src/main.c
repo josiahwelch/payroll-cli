@@ -23,14 +23,14 @@ struct Account {
 	char EIN[10];
 	char address[128];
 	struct Employee employees[128];
-	uint8_t employeeCount = 0;
+	uint8_t employeeCount;
 };
 
 // I know this is inefficient, but I am too lazy to do anything but a brute-force approach
-struct Employee* getEmployee(struct Employee* employees, char* id) {
-	for (int i=0;i<employeeCount;i++) {
-		if (!strcmp(employees[i]->id, id)) {
-			return employees[i];
+struct Employee* getEmployee(struct Account* account, char* id) {
+	for (int i=0;i<account->employeeCount;i++) {
+		if (!strcmp(account->employees[i].id, id)) {
+			return &account->employees[i];
 		}
 	}
 	return NULL;
@@ -51,13 +51,13 @@ void removePayrollCLI(char* arg) {
 // Checks to close the file
 void closeFile(FILE* fPtr) {if (fPtr != NULL) {fclose(fPtr);}}
 
-void getAccount(struct Account account, char* address) {
+void getAccount(struct Account* account, char* address) {
 	FILE* fPtr = fopen(address, "r");
 	fread(&account, sizeof(account), 1, fPtr);
 	closeFile(fPtr);
 }
 
-void saveAccount(struct Account account, char* address) {
+void saveAccount(struct Account* account, char* address) {
 	FILE* fPtr = fopen(address, "w");
 	fwrite(&account, sizeof(account), 1, fPtr);
 	closeFile(fPtr);
@@ -78,6 +78,7 @@ int main(int argc, char **argv) {
 	char *empPayStrEndPtr;
 	float empPay;
 	char empType[6];
+	char empSSN[12];
 
 	char buf[1];
 
@@ -89,6 +90,7 @@ int main(int argc, char **argv) {
 	int empPayLoop = 1;
 
 	struct Account account;
+	account.employeeCount = 0; // Needed bc I cannot set it in the struct
 	struct Employee* employee;
 
 	// Sets absLoc
@@ -98,7 +100,7 @@ int main(int argc, char **argv) {
 	while (acctInputLoop) {
 		printf("Input account id: ");
 		memset(acct, '\0', sizeof(acct)); // Clears buffer
-		scanf("%s", &acct);
+		scanf("%[^\n]%*c", &acct);
 		sprintf(acctAddr, "%s/data/%s->dat", absLoc, acct);
 		fPtr = fopen(acctAddr, "r");
 		if (fPtr == NULL) {
@@ -107,21 +109,21 @@ int main(int argc, char **argv) {
 			acctCreationLoop = 1;
 			while (acctCreationLoop) {
 				memset(buf, '\0', sizeof(buf)); // Clears buffer
-				scanf("%s", &buf);
+				scanf("%[^\n]%*c", &buf);
 				acctCreationLoop = 0;
 				if (buf[0] == 'Y' || buf[0] == 'y') { 
 					printf("Enter the name of the account: ");
 					memset(acctName, '\0', sizeof(acctName)); // Clears buffer
-					scanf("%s", &acctName); 
-					strcpy(account->name, acctName);
+					scanf("%[^\n]%*c", &acctName); 
+					strcpy(account.name, acctName);
 					printf("Enter the EIN of the account (XX-XXXXXXX): ");
 					memset(acctEIN, '\0', sizeof(acctEIN)); // Clears buffer
-					scanf("%s", &acctEIN);
-					strcpy(account->EIN, acctEIN);
+					scanf("%[^\n]%*c", &acctEIN);
+					strcpy(account.EIN, acctEIN);
 					printf("Enter the address of the account: ");
 					memset(acctAddress, '\0', sizeof(acctAddress)); // Clears buffer
-					scanf("%s", &acctAddress);
-					strcpy(account->address, acctAddress);
+					scanf("%[^\n]%*c", &acctAddress);
+					strcpy(account.address, acctAddress);
 				}
 				else if (buf[0] != 'N' && buf[0] != 'n') {
 					acctCreationLoop = 1;
@@ -131,13 +133,13 @@ int main(int argc, char **argv) {
 		}
 		else {
 			closeFile(fPtr);
-			getAccount(account, acctAddr);
+			getAccount(&account, acctAddr);
 		}
 		mainLoop = 1;
 		while (mainLoop) {
-			printf("What do you want to do?\n\t1-> Add new payroll batch\n\t2-> Edit/print old payroll sheets->\n\t3-> Edit/add employees->\n\t4-> View account info->\n\t5-> Save and exit->\n\t6-> Quit->\n[1, 2, 3, 4, 5, or 6]: ");
+			printf("What do you want to do?\n\t1. Add new payroll batch.\n\t2. Edit/print old payroll sheets.\n\t3. Edit/add employees.\n\t4. View account info.\n\t5. Save and exit.\n\t6. Quit.\n[1, 2, 3, 4, 5, or 6]: ");
 			memset(buf, '\0', sizeof(buf)); // Clears buffer
-			scanf("%s", &buf);
+			scanf("%[^\n]%*c", &buf);
 			if (buf[0] == '1') {
 			} else if (buf[0] == '2') {
 			} else if (buf[0] == '3') {
@@ -145,34 +147,34 @@ int main(int argc, char **argv) {
 				while (empLoop) {
 					printf("Enter the employee's ID (enter '?' to list all employees): ");
 					memset(emp, '\0', sizeof(emp)); // Clears buffer
-					scanf("%s", &emp);
-					employee = getEmployee(account->employees, emp);
+					scanf("%[^\n]%*c", &emp);
+					employee = getEmployee(&account, emp);
 					if (employee == NULL) { 
 						printf("That employee was not found! Would you like to create it? [Y/N]: ");
 						empCreationLoop = 1;
 						while (empCreationLoop) {
 							memset(buf, '\0', sizeof(buf)); // Clears buffer
-							scanf("%s", &buf);
+							scanf("%[^\n]%*c", &buf);
 							empCreationLoop = 0;
 							if (buf[0] == 'Y' || buf[0] == 'y') { 
-								employee = account->employees[account->empCount];
+								employee = &account.employees[account.employeeCount];
 								printf("Enter the employee's name: ");
 								memset(empName, '\0', sizeof(empName)); // Clears buffer
-								scanf("%s", &empName);
+								scanf("%[^\n]%*c", &empName);
 								strcpy(employee->name, empName);
-								printf("Enter the employee's SSN (XXX-XXX-XXXX): ");
+								printf("Enter the employee's SSN (XXX-XX-XXXX): ");
 								memset(empSSN, '\0', sizeof(empSSN)); // Clears buffer
-								scanf("%s", &empSSN);
+								scanf("%[^\n]%*c", &empSSN);
 								strcpy(employee->SSN, empSSN);
 								printf("Enter the employee's address (enter '^' to use account's address): ");
 								memset(empAddr, '\0', sizeof(empAddr)); // Clears buffer
-								scanf("%s", &empAddr);
+								scanf("%[^\n]%*c", &empAddr);
 								strcpy(employee->address, empAddr);
 								empPayLoop = 1;
 								while (empPayLoop) {
 									printf("Enter the employee's pay (USD): ");
 									memset(empPayStr, '\0', sizeof(empPayStr)); // Clears buffer
-									scanf("%s", &empPayStr);
+									scanf("%[^\n]%*c", &empPayStr);
 									empPay = strtof(empPayStr, &empPayStrEndPtr);
 									if (*empPayStrEndPtr == '\0') {
 										employee->pay = empPay;
@@ -182,27 +184,28 @@ int main(int argc, char **argv) {
 									}
 									printf("Enter the employee's type [S(alary)/H(ourly)]: ");
 									memset(empType, '\0', sizeof(empType)); // Clears buffer
-									scanf("%s", &empType);
+									scanf("%[^\n]%*c", &empType);
 									if (empType[0] == 'S' || empType[0] == 's') {
-										employee->type = EmployeeType->SALARY;
+										employee->type = SALARY;
 									} else if (empType[0] == 'H' || empType[0] == 'h') {
-										employee->type = EmployeeType->HOURLY;
+										employee->type = HOURLY;
 									}
 								}
 							}
 						}
 					}
+				}
 
 			} else if (buf[0] == '4') {
 			} else if (buf[0] == '5') {
-				printf("Saving account->->->\n");
-				saveAccount(account, acctAddr);
+				printf("Saving account...\n");
+				saveAccount(&account, acctAddr);
 				mainLoop = 0;
 			} else if (buf[0] == '6') {
-				printf("Quitting->->->\n");
+				printf("Quitting...\n");
 				return 0;
 			} else {
-				printf("\"%s\" was not understood-> ", buf);
+				printf("\"%s\" was not understood. ", buf);
 			}
 		}
 	}
