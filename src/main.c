@@ -98,10 +98,13 @@ int main(int argc, char **argv) {
 	removePayrollCLI(absLoc);
 
 	while (acctInputLoop) {
-		printf("Input account id: ");
+		printf("Input account id (enter '.' to quit): ");
 		memset(acct, '\0', sizeof(acct)); // Clears buffer
 		scanf("%[^\n]%*c", &acct);
-		sprintf(acctAddr, "%s/data/%s->dat", absLoc, acct);
+		if (acct[0] == '.') {
+			return 0;
+		}
+		sprintf(acctAddr, "%s/data/%s.dat", absLoc, acct);
 		fPtr = fopen(acctAddr, "r");
 		if (fPtr == NULL) {
 			closeFile(fPtr);
@@ -127,7 +130,7 @@ int main(int argc, char **argv) {
 				}
 				else if (buf[0] != 'N' && buf[0] != 'n') {
 					acctCreationLoop = 1;
-					printf("\"%s\" was not understood-> Would you like to create that account? [Y/N]: ", buf);
+					printf("\"%s\" was not understood. Would you like to create that account? [Y/N]: ", buf);
 				}
 			}
 		}
@@ -137,7 +140,7 @@ int main(int argc, char **argv) {
 		}
 		mainLoop = 1;
 		while (mainLoop) {
-			printf("What do you want to do?\n\t1. Add new payroll batch.\n\t2. Edit/print old payroll sheets.\n\t3. Edit/add employees.\n\t4. View account info.\n\t5. Save and exit.\n\t6. Quit.\n[1, 2, 3, 4, 5, or 6]: ");
+			printf("What do you want to do?\n\t1. Add new payroll batch.\n\t2. Edit/print old payroll sheets.\n\t3. Edit/add employees.\n\t4. View account info.\n\t5. Save and exit.\n\t6. Exit without saving.\n[1, 2, 3, 4, 5, or 6]: ");
 			memset(buf, '\0', sizeof(buf)); // Clears buffer
 			scanf("%[^\n]%*c", &buf);
 			if (buf[0] == '1') {
@@ -145,9 +148,18 @@ int main(int argc, char **argv) {
 			} else if (buf[0] == '3') {
 				empLoop = 1;
 				while (empLoop) {
-					printf("Enter the employee's ID (enter '?' to list all employees): ");
+					printf("Enter the employee's ID (enter '?' to list all employees or enter '.' to exit): ");
 					memset(emp, '\0', sizeof(emp)); // Clears buffer
 					scanf("%[^\n]%*c", &emp);
+					if (emp == '.') {
+						empLoop = 0;
+						employee = &account.employees[0]; // Random non-NULL employee
+					}
+					else if (emp == '?') {
+						for (int i=0;i<account.employeeCount;i++) {
+							printf("%i. %s - %s - %s - %f", i, account.employees[i].name, account.employees[i].SSN, account.employees[i].address, account.employees[i].pay);
+						}
+					}
 					employee = getEmployee(&account, emp);
 					if (employee == NULL) { 
 						printf("That employee was not found! Would you like to create it? [Y/N]: ");
