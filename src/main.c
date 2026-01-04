@@ -11,7 +11,7 @@ enum EmployeeType {
 struct Employee {
 	char id[16];
 	char name[32];
-	char SSN[11];
+	char SSN[12];
 	char address[128];
 	float pay;
 	enum EmployeeType type;
@@ -20,7 +20,7 @@ struct Employee {
 struct Account {
 	char id[16];
 	char name[32];
-	char EIN[10];
+	char EIN[11];
 	char address[128];
 	struct Employee employees[128];
 	uint8_t employeeCount;
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 	FILE* fPtr;
 	char acct[16];
 	char acctName[32];
-	char acctEIN[11];
+	char acctEIN[10];
 	char acctAddr[128];
 	char acctAddress[128];
 	char absLoc[128];
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 	char *empPayStrEndPtr;
 	float empPay;
 	char empType[6];
-	char empSSN[12];
+	char empSSN[11];
 
 	char buf[1];
 
@@ -92,7 +92,6 @@ int main(int argc, char **argv) {
 	int empPayLoop = 1;
 
 	struct Account account;
-	account.employeeCount = 0; // Needed bc I cannot set it in the struct
 	struct Employee* employee;
 
 	// Sets absLoc
@@ -130,6 +129,7 @@ int main(int argc, char **argv) {
 					memset(acctAddress, '\0', sizeof(acctAddress)); // Clears buffer
 					scanf("%[^\n]%*c", &acctAddress);
 					strcpy(account.address, acctAddress);
+					account.employeeCount = 0; // Needed bc I cannot set it in the struct
 					mainLoop = 1;
 				}
 				else if (buf[0] != 'N' && buf[0] != 'n') {
