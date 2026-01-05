@@ -17,6 +17,7 @@ struct Employee {
 	enum EmployeeType type;
 	float addlDeduct;
 	uint8_t active;
+	uint8_t exceptions;
 	float YTD;
 	float OTYTD;
 	float grossYTD;
@@ -37,6 +38,39 @@ struct Account {
 	struct Employee employees[128];
 	uint8_t employeeCount;
 	uint8_t saveCount;
+};
+
+struct Paystub {
+	char id[16]; // Equal to id of employee from where the payroll batch originates
+	char address[128];
+	char checkDate[32];
+	char acctEIN[16];
+	char payPeriod[64];
+	uint8_t exceptions;
+	char SSN[16];
+	long hours;
+	long OTHours;
+	float current;
+	float OTCurrent;
+	float grossPay;
+	float netPay;
+	float YTD;
+	float OTYTD;
+	float grossYTD;
+	float netYTD;
+	float fedYTD;
+	float SSYTD;
+	float medYTD;
+	float stateYTD;
+	float addlYTD;
+	float deductYTD;
+	float deduct;
+};
+
+struct PayrollBatch {
+	char accountId[16]; // Equal to id of account from where the payroll batch originates
+	char payPeriod[64];
+	struct Paystub paystubs[128];
 };
 
 void getStr(char* buffer, size_t sizeofBuf) {
@@ -139,6 +173,8 @@ int main(int argc, char **argv) {
 	char empType[8];
 	char empSSN[16];
 	float empDeduct;
+	float empHours;
+	float empSpecNetMod;
 
 	char buf[8];
 
@@ -203,6 +239,11 @@ int main(int argc, char **argv) {
 			printf("What do you want to do?\n\t1. Add new payroll batch.\n\t2. Edit/print old payroll sheets.\n\t3. Edit/add employees.\n\t4. View account info.\n\t5. Save and exit.\n\t6. Exit without saving.\n[1, 2, 3, 4, 5, or 6]: ");
 			getStr(buf, sizeof(buf));
 			if (buf[0] == '1') {
+				for (int i=0;i<account.employeeCount;i++) {
+					if (account.employees[i].active) {
+						printf("%s: %s's hours: ", account.employees[i].id, account.employees[i].name);
+						getFlt(empHours);
+
 			} else if (buf[0] == '2') {
 			} else if (buf[0] == '3') {
 				empLoop = 1;
