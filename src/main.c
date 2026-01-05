@@ -45,6 +45,30 @@ void getStr(char* buffer, size_t sizeofBuf) {
 	buffer[strcspn(buffer, "\n")] = 0;
 }
 
+void getLong(long* longBuf) {
+	char buf[16];
+	char *endPtr;
+	uint8_t loop = 1;
+	while (loop) {
+		getStr(buf, sizeof(buf));
+		*longBuf = strtol(buf, &endPtr, sizeof(buf));
+		if (*endPtr == '\0') {loop = 0;}
+		else {printf("\"%s\" was not recognized... try again: ", endPtr);}
+	}
+}
+
+void getFlt(float* fltBuf) {
+	char buf[16];
+	char *endPtr;
+	uint8_t loop = 1;
+	while (loop) {
+		getStr(buf, sizeof(buf));
+		*fltBuf = strtof(buf, &endPtr);
+		if (*endPtr == '\0') {loop = 0;}
+		else {printf("\"%s\" was not recognized... try again: ", endPtr);}
+	}
+}
+
 // I know this is inefficient, but I am too lazy to do anything but a brute-force approach
 struct Employee* getEmployee(struct Account* account, char* id) {
 	for (int i=0;i<account->employeeCount;i++) {
@@ -264,14 +288,9 @@ int main(int argc, char **argv) {
 							empPayLoop = 1;
 							while (empPayLoop) {
 								printf("Enter the employee's new pay (USD): ");
-								getStr(empPayStr, sizeof(empPayStr));
-								empPay = strtof(empPayStr, &empPayStrEndPtr);
-								if (*empPayStrEndPtr == '\0') {
-									employee->pay = empPay;
-									empPayLoop = 0;
-								} else {
-									printf("\"%s\" was not recognized! ", empPayStrEndPtr);
-								}
+								getFlt(&empPay);
+								employee->pay = empPay;
+								empPayLoop = 0;
 								printf("Enter the employee's new type [S(alary)/H(ourly)]: ");
 								getStr(empType, sizeof(empType));
 								if (empType[0] == 'S' || empType[0] == 's') {
