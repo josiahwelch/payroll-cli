@@ -180,7 +180,8 @@ int main(int argc, char **argv) {
 					}
 					else if (emp[0] == '?') {
 						for (int i=0;i<account.employeeCount;i++) {
-							printf("%i. %s - %s - %s - %f\n", i, account.employees[i].name, account.employees[i].SSN, account.employees[i].address, account.employees[i].pay);
+							printf("#. id: name - SSN - address - pay\n");
+							printf("%i. %s: %s - %s - %s - %f\n", i+1, account.employees[i].id, account.employees[i].name, account.employees[i].SSN, account.employees[i].address, account.employees[i].pay);
 						}
 						employee = &notNULL; // Random non-NULL employee
 						empMainLoop = 0;
@@ -194,6 +195,7 @@ int main(int argc, char **argv) {
 							empCreationLoop = 0;
 							if (buf[0] == 'Y' || buf[0] == 'y') { 
 								employee = &account.employees[account.employeeCount];
+								strcpy(employee->id, emp);
 								printf("Enter the employee's name: ");
 								memset(empName, '\0', sizeof(empName)); // Clears buffer
 								scanf("%[^\n]%*c", &empName);
@@ -280,12 +282,12 @@ int main(int argc, char **argv) {
 						} else if (buf[0] == '5') {
 							printf("Deleting employee...\n");
 							if (deleteEmployee(&account, employee->id)) {
-								empLoop = 0;
+								empMainLoop = 0;
 							} else {
 								printf("Failed to delete employee!");
 							}
 						} else if (buf[0] == '6') {
-							empLoop = 0;
+							empMainLoop = 0;
 						}
 					}
 				}
