@@ -243,14 +243,9 @@ int main(int argc, char **argv) {
 								empPayLoop = 1;
 								while (empPayLoop) {
 									printf("Enter the employee's pay (USD): ");
-									getStr(empPayStr, sizeof(empPayStr));
-									empPay = strtof(empPayStr, &empPayStrEndPtr);
-									if (*empPayStrEndPtr == '\0') {
-										employee->pay = empPay;
-										empPayLoop = 0;
-									} else {
-										printf("\"%s\" was not recognized! ", empPayStrEndPtr);
-									}
+									getFlt(&empPay);
+									employee->pay = empPay;
+									empPayLoop = 0;
 									printf("Enter the employee's type [S(alary)/H(ourly)]: ");
 									getStr(empType, sizeof(empType));
 									if (empType[0] == 'S' || empType[0] == 's') {
