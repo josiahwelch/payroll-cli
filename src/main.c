@@ -37,7 +37,6 @@ struct Account {
 	struct Employee employees[128];
 	uint8_t employeeCount;
 	uint8_t saveCount;
-
 };
 
 void getStr(char* buffer) {
@@ -236,6 +235,7 @@ int main(int argc, char **argv) {
 										employee->type = HOURLY;
 									}
 								}
+								employee->active = 1; // IDK of a better way of setting this param
 								account.employeeCount += 1;
 							}
 						}
@@ -249,7 +249,7 @@ int main(int argc, char **argv) {
 						}
 					}
 					while (empMainLoop) {
-						printf("What do you want to do?\n\t1. Change id.\n\t2. Change name.\n\t3. Change SSN.\n\t4. Change pay.\n\t5. Delete employee.\n\t6. View info.\n\t7. Exit.\n[1, 2, 3, 4, 5, 6, or 7]: ");
+						printf("What do you want to do?\n\t1. Change id.\n\t2. Change name.\n\t3. Change SSN.\n\t4. Change pay.\n\t5. Delete employee.\n\t6. View info.\n\t7. Change active status.\n\t8. Exit.\n[1, 2, 3, 4, 5, 6, 7, or 8]: ");
 						getStr(buf);
 						if (buf[0] == '1') {
 							printf("Enter the employee's new id: ");
@@ -288,8 +288,10 @@ int main(int argc, char **argv) {
 								printf("Failed to delete employee!");
 							}
 						} else if (buf[0] == '6') {
-							printf("id:\t\t%s\nname:\t\t%s\nSSN:\t\t%s\npay:\t\t%f\n", employee->id, employee->name, employee->SSN, employee->pay);
+							printf("id:\t\t%s\nname:\t\t%s\nSSN:\t\t%s\npay:\t\t%f\nActive?:\t\t%s\n", employee->id, employee->name, employee->SSN, employee->pay, employee->active ? "Yes" : "No");
 						} else if (buf[0] == '7') {
+							printf("Setting employee to %sactive...", employee->active ? "" : "in");
+						} else if (buf[0] == '8') {
 							empMainLoop = 0;
 						}
 					}
