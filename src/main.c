@@ -11,7 +11,7 @@ enum EmployeeType {
 struct Employee {
 	char id[16];
 	char name[32];
-	char SSN[12];
+	char SSN[16];
 	char address[128];
 	float pay;
 	enum EmployeeType type;
@@ -32,16 +32,16 @@ struct Employee {
 struct Account {
 	char id[16];
 	char name[32];
-	char EIN[11];
+	char EIN[16];
 	char address[128];
 	struct Employee employees[128];
 	uint8_t employeeCount;
 	uint8_t saveCount;
 };
 
-void getStr(char* buffer) {
-	memset(buffer, '\0', sizeof(buffer)); // Clears buffer
-	while (fgets(buffer, sizeof(buffer), stdin) == NULL || !strcmp(buffer,  "\n")) {}
+void getStr(char* buffer, size_t sizeofBuf) {
+	memset(buffer, '\0', sizeofBuf); // Clears buffer
+	while (fgets(buffer, sizeofBuf, stdin) == NULL || !strcmp(buffer, "\n")) {}
 	buffer[strcspn(buffer, "\n")] = 0;
 }
 
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
 	FILE* fPtr;
 	char acct[16];
 	char acctName[32];
-	char acctEIN[10];
+	char acctEIN[16];
 	char acctAddr[128];
 	char acctAddress[128];
 	char absLoc[128];
@@ -112,10 +112,10 @@ int main(int argc, char **argv) {
 	char empPayStr[16];
 	char *empPayStrEndPtr;
 	float empPay;
-	char empType[6];
-	char empSSN[11];
+	char empType[8];
+	char empSSN[16];
 
-	char buf[1];
+	char buf[8];
 
 	struct Employee notNULL;
 
@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
 
 	while (acctInputLoop) {
 		printf("Input account id (enter '.' to quit): ");
-		getStr(acct);
+		getStr(acct, sizeof(acct));
 		if (acct[0] == '.') {
 			return 0;
 		}
@@ -148,17 +148,17 @@ int main(int argc, char **argv) {
 			printf("That account was not found! Would you like to create it? [Y/N]: ");
 			acctCreationLoop = 1;
 			while (acctCreationLoop) {
-				getStr(buf);
+				getStr(buf, sizeof(buf));
 				acctCreationLoop = 0;
 				if (buf[0] == 'Y' || buf[0] == 'y') { 
 					printf("Enter the name of the account: ");
-					getStr(acctName);
+					getStr(acctName, sizeof(acctName));
 					strcpy(account.name, acctName);
 					printf("Enter the EIN of the account (XX-XXXXXXX): ");
-					getStr(acctEIN);
+					getStr(acctEIN, sizeof(acctEIN));
 					strcpy(account.EIN, acctEIN);
 					printf("Enter the address of the account: ");
-					getStr(acctAddress);
+					getStr(acctAddress, sizeof(acctAddress));
 					strcpy(account.address, acctAddress);
 					account.employeeCount = 0; // Needed bc I cannot set it in the struct
 					mainLoop = 1;
@@ -176,14 +176,14 @@ int main(int argc, char **argv) {
 		}
 		while (mainLoop) {
 			printf("What do you want to do?\n\t1. Add new payroll batch.\n\t2. Edit/print old payroll sheets.\n\t3. Edit/add employees.\n\t4. View account info.\n\t5. Save and exit.\n\t6. Exit without saving.\n[1, 2, 3, 4, 5, or 6]: ");
-			getStr(buf);
+			getStr(buf, sizeof(buf));
 			if (buf[0] == '1') {
 			} else if (buf[0] == '2') {
 			} else if (buf[0] == '3') {
 				empLoop = 1;
 				while (empLoop) {
 					printf("Enter the employee's ID (enter '?' to list all employees or enter '.' to exit): ");
-					getStr(emp);
+					getStr(emp, sizeof(emp));
 					employee = getEmployee(&account, emp);
 					if (emp[0] == '.') {
 						empLoop = 0;
@@ -202,24 +202,24 @@ int main(int argc, char **argv) {
 						printf("That employee was not found! Would you like to create it? [Y/N]: ");
 						empCreationLoop = 1;
 						while (empCreationLoop) {
-							getStr(buf);
+							getStr(buf, sizeof(buf));
 							empCreationLoop = 0;
 							if (buf[0] == 'Y' || buf[0] == 'y') { 
 								employee = &account.employees[account.employeeCount];
 								strcpy(employee->id, emp);
 								printf("Enter the employee's name: ");
-								getStr(empName);
+								getStr(empName, sizeof(empName));
 								strcpy(employee->name, empName);
 								printf("Enter the employee's SSN (XXX-XX-XXXX): ");
-								getStr(empSSN);
+								getStr(empSSN, sizeof(empSSN));
 								strcpy(employee->SSN, empSSN);
 								printf("Enter the employee's address (enter '^' to use account's address): ");
-								getStr(empAddr);
+								getStr(empAddr, sizeof(empAddr));
 								strcpy(employee->address, empAddr);
 								empPayLoop = 1;
 								while (empPayLoop) {
 									printf("Enter the employee's pay (USD): ");
-									getStr(empPayStr);
+									getStr(empPayStr, sizeof(empPayStr));
 									empPay = strtof(empPayStr, &empPayStrEndPtr);
 									if (*empPayStrEndPtr == '\0') {
 										employee->pay = empPay;
@@ -228,7 +228,7 @@ int main(int argc, char **argv) {
 										printf("\"%s\" was not recognized! ", empPayStrEndPtr);
 									}
 									printf("Enter the employee's type [S(alary)/H(ourly)]: ");
-									getStr(empType);
+									getStr(empType, sizeof(empType));
 									if (empType[0] == 'S' || empType[0] == 's') {
 										employee->type = SALARY;
 									} else if (empType[0] == 'H' || empType[0] == 'h') {
@@ -250,21 +250,21 @@ int main(int argc, char **argv) {
 					}
 					while (empMainLoop) {
 						printf("What do you want to do?\n\t1. Change id.\n\t2. Change name.\n\t3. Change SSN.\n\t4. Change pay.\n\t5. Delete employee.\n\t6. View info.\n\t7. Change active status.\n\t8. Exit.\n[1, 2, 3, 4, 5, 6, 7, or 8]: ");
-						getStr(buf);
+						getStr(buf, sizeof(buf));
 						if (buf[0] == '1') {
 							printf("Enter the employee's new id: ");
-							getStr(emp);
+							getStr(emp, sizeof(emp));
 						} else if (buf[0] == '2') {
 							printf("Enter the employee's new name: ");
-							getStr(empName);
+							getStr(empName, sizeof(empName));
 						} else if (buf[0] == '3') {
 							printf("Enter the employee's new SSN: ");
-							getStr(empSSN);
+							getStr(empSSN, sizeof(empSSN));
 						} else if (buf[0] == '4') {
 							empPayLoop = 1;
 							while (empPayLoop) {
 								printf("Enter the employee's new pay (USD): ");
-								getStr(empPayStr);
+								getStr(empPayStr, sizeof(empPayStr));
 								empPay = strtof(empPayStr, &empPayStrEndPtr);
 								if (*empPayStrEndPtr == '\0') {
 									employee->pay = empPay;
@@ -273,7 +273,7 @@ int main(int argc, char **argv) {
 									printf("\"%s\" was not recognized! ", empPayStrEndPtr);
 								}
 								printf("Enter the employee's new type [S(alary)/H(ourly)]: ");
-								getStr(empType);
+								getStr(empType, sizeof(empType));
 								if (empType[0] == 'S' || empType[0] == 's') {
 									employee->type = SALARY;
 								} else if (empType[0] == 'H' || empType[0] == 'h') {
