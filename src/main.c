@@ -24,6 +24,7 @@ struct Account {
 	char address[128];
 	struct Employee employees[128];
 	uint8_t employeeCount;
+	uint8_t saveCount;
 };
 
 // I know this is inefficient, but I am too lazy to do anything but a brute-force approach
@@ -52,14 +53,15 @@ void removePayrollCLI(char* arg) {
 void closeFile(FILE* fPtr) {if (fPtr != NULL) {fclose(fPtr);}}
 
 void getAccount(struct Account* account, char* address) {
-	FILE* fPtr = fopen(address, "r");
-	fread(&account, sizeof(account), 1, fPtr);
+	FILE* fPtr = fopen(address, "rb");
+	fread(account, sizeof(struct Account), 1, fPtr);
 	closeFile(fPtr);
 }
 
 void saveAccount(struct Account* account, char* address) {
-	FILE* fPtr = fopen(address, "w");
-	fwrite(&account, sizeof(account), 1, fPtr);
+	account->saveCount += 1;
+	FILE* fPtr = fopen(address, "wb");
+	fwrite(account, sizeof(struct Account), 1, fPtr);
 	closeFile(fPtr);
 }
 
@@ -162,7 +164,7 @@ int main(int argc, char **argv) {
 					}
 					else if (emp[0] == '?') {
 						for (int i=0;i<account.employeeCount;i++) {
-							printf("%i. %s - %s - %s - %f", i, account.employees[i].name, account.employees[i].SSN, account.employees[i].address, account.employees[i].pay);
+							printf("%i. %s - %s - %s - %f\n", i, account.employees[i].name, account.employees[i].SSN, account.employees[i].address, account.employees[i].pay);
 						}
 						employee = &notNULL; // Random non-NULL employee
 					}
@@ -208,20 +210,22 @@ int main(int argc, char **argv) {
 										employee->type = HOURLY;
 									}
 								}
-								account.employeeCount++;
+								account.employeeCount += 1;
 							}
 						}
 					}
 				}
 
 			} else if (buf[0] == '4') {
+				printf("%i\n", account.saveCount);
+				printf("%s\n", account.name);
 			} else if (buf[0] == '5') {
 				printf("Saving account...\n");
 				saveAccount(&account, acctAddr);
 				mainLoop = 0;
 			} else if (buf[0] == '6') {
-				printf("Quitting...\n");
-				return 0;
+				printf("exiting...\n");
+				mainLoop = 0;
 			} else {
 				printf("\"%s\" was not understood. ", buf);
 			}
