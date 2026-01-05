@@ -15,7 +15,7 @@ struct Employee {
 	char address[128];
 	float pay;
 	enum EmployeeType type;
-	float addlDeductions;
+	float addlDeduct;
 	uint8_t active;
 	float YTD;
 	float OTYTD;
@@ -138,6 +138,7 @@ int main(int argc, char **argv) {
 	float empPay;
 	char empType[8];
 	char empSSN[16];
+	float empDeduct;
 
 	char buf[8];
 
@@ -215,9 +216,9 @@ int main(int argc, char **argv) {
 						empMainLoop = 0;
 					}
 					else if (emp[0] == '?') {
+						printf("#. id: name - SSN - address - pay - additional deductions\n");
 						for (int i=0;i<account.employeeCount;i++) {
-							printf("#. id: name - SSN - address - pay\n");
-							printf("%i. %s: %s - %s - %s - %f\n", i+1, account.employees[i].id, account.employees[i].name, account.employees[i].SSN, account.employees[i].address, account.employees[i].pay);
+							printf("%i. %s: %s - %s - %s - %f %s - %f\n", i+1, account.employees[i].id, account.employees[i].name, account.employees[i].SSN, account.employees[i].address, account.employees[i].pay, account.employees[i].type==SALARY ? "salaried" : "$/hr", account.employees[i].addlDeduct);
 						}
 						employee = &notNULL; // Random non-NULL employee
 						empMainLoop = 0;
@@ -254,12 +255,15 @@ int main(int argc, char **argv) {
 										employee->type = HOURLY;
 									}
 								}
+								printf("Enter additional deduction amount (USD, enter '0' for none): ");
+								getFlt(&empDeduct);
+								employee->addlDeduct = empDeduct;
 								employee->active = 1; // IDK of a better way of setting this param
 								account.employeeCount += 1;
 							}
 						}
 						empMainLoop = 1;
-					} else { // There are probably better ways of doing this but idc
+					} else { // There are probably better ways of doing this but IDC
 						employee = getEmployee(&account, emp);
 						if (employee != NULL) {
 							empMainLoop = 1;
@@ -268,7 +272,7 @@ int main(int argc, char **argv) {
 						}
 					}
 					while (empMainLoop) {
-						printf("What do you want to do?\n\t1. Change id.\n\t2. Change name.\n\t3. Change SSN.\n\t4. Change pay.\n\t5. Delete employee.\n\t6. View info.\n\t7. Change active status.\n\t8. Exit.\n[1, 2, 3, 4, 5, 6, 7, or 8]: ");
+						printf("What do you want to do?\n\t1. Change id.\n\t2. Change name.\n\t3. Change SSN.\n\t4. Change pay.\n\t5. Change active status.\n\t6. Change additional deduction amount.\n\t7. Delete employee.\n\t8. View info.\n\t9. Exit.\n[1, 2, 3, 4, 5, 6, 7, 8, or 9]: ");
 						getStr(buf, sizeof(buf));
 						if (buf[0] == '1') {
 							printf("Enter the employee's new id: ");
@@ -295,18 +299,22 @@ int main(int argc, char **argv) {
 								}
 							}
 						} else if (buf[0] == '5') {
+							printf("Setting employee to %sactive...\n", employee->active ? "" : "in");
+							employee->active = employee->active ? 0 : 1; // Toggles active
+						} else if (buf[0] == '6') {
+							printf("Enter the new additional deduction amount (USD, enter '0' for none): ");
+							getFlt(&empDeduct);
+							employee->addlDeduct = empDeduct;
+						} else if (buf[0] == '7') {
 							printf("Deleting employee...\n");
 							if (deleteEmployee(&account, employee->id)) {
 								empMainLoop = 0;
 							} else {
 								printf("Failed to delete employee!\n");
 							}
-						} else if (buf[0] == '6') {
-							printf("id:\t\t%s\nname:\t\t%s\nSSN:\t\t%s\npay:\t\t%f\nActive?:\t%s\n", employee->id, employee->name, employee->SSN, employee->pay, employee->active ? "Yes" : "No");
-						} else if (buf[0] == '7') {
-							printf("Setting employee to %sactive...\n", employee->active ? "" : "in");
-							employee->active = employee->active ? 0 : 1; // Toggles active
 						} else if (buf[0] == '8') {
+							printf("id:\t\t%s\nname:\t\t%s\nSSN:\t\t%s\npay:\t\t%f %s\nadditional deductions:\t%f\nActive?:\t%s\n", employee->id, employee->name, employee->SSN, employee->pay, employee->type==SALARY ? "salaried" : "$/hr", employee->addlDeduct, employee->active ? "Yes" : "No");
+						} else if (buf[0] == '9') {
 							empMainLoop = 0;
 						}
 					}
