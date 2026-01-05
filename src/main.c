@@ -242,7 +242,7 @@ int main(int argc, char **argv) {
 						}
 					}
 					while (empMainLoop) {
-						printf("What do you want to do?\n\t1. Change id.\n\t2. Change name.\n\t3. Change SSN.\n\t4. Change pay.\n\t5. Delete employee.\n\t6. Exit.\n[1, 2, 3, 4, 5, or 6]: ");
+						printf("What do you want to do?\n\t1. Change id.\n\t2. Change name.\n\t3. Change SSN.\n\t4. Change pay.\n\t5. Delete employee.\n\t6. View info.\n\t7. Exit.\n[1, 2, 3, 4, 5, 6, or 7]: ");
 						memset(buf, '\0', sizeof(buf)); // Clears buffer
 						scanf("%[^\n]%*c", &buf);
 						if (buf[0] == '1') {
@@ -287,6 +287,10 @@ int main(int argc, char **argv) {
 								printf("Failed to delete employee!");
 							}
 						} else if (buf[0] == '6') {
+							printf("id:\t\t%s\nname:\t\t%s\nSSN:\t\t%s\npay:\t\t%f\n", employee->id, employee->name, employee->SSN, employee->pay);
+							printf("Press enter...");
+							scanf("%c", &buf);
+						} else if (buf[0] == '7') {
 							empMainLoop = 0;
 						}
 					}
