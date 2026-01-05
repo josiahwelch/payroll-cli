@@ -37,6 +37,20 @@ struct Employee* getEmployee(struct Account* account, char* id) {
 	return NULL;
 }
 
+// Similar to getEmployee()
+uint8_t deleteEmployee(struct Account* account, char* id) {
+	uint8_t index = account->employeeCount; // Sets to unreachable value
+	for (int i=0;i<account->employeeCount;i++) {
+		if (!strcmp(account->employees[i].id, id)) {
+			index = i;
+		}
+		else if (index < i) {
+			account->employees[i-1] = account->employees[i];
+		}
+	}
+	return index<account->employeeCount; // Checks if index is the unreachable value or not
+}
+
 uint16_t getStrLen(char* string) {
 	int i;
 	for (i=0;string[i]!='\0';i++) {}
@@ -92,6 +106,7 @@ int main(int argc, char **argv) {
 	int empLoop = 1;
 	int empCreationLoop = 1;
 	int empPayLoop = 1;
+	int empMainLoop = 1;
 
 	struct Account account;
 	struct Employee* employee;
@@ -161,12 +176,14 @@ int main(int argc, char **argv) {
 					if (emp[0] == '.') {
 						empLoop = 0;
 						employee = &notNULL; // Random non-NULL employee
+						empMainLoop = 0;
 					}
 					else if (emp[0] == '?') {
 						for (int i=0;i<account.employeeCount;i++) {
 							printf("%i. %s - %s - %s - %f\n", i, account.employees[i].name, account.employees[i].SSN, account.employees[i].address, account.employees[i].pay);
 						}
 						employee = &notNULL; // Random non-NULL employee
+						empMainLoop = 0;
 					}
 					if (employee == NULL) { 
 						printf("That employee was not found! Would you like to create it? [Y/N]: ");
@@ -212,6 +229,63 @@ int main(int argc, char **argv) {
 								}
 								account.employeeCount += 1;
 							}
+						}
+						empMainLoop = 1;
+					} else { // There are probably better ways of doing this but idc
+						employee = getEmployee(&account, emp);
+						if (employee != NULL) {
+							empMainLoop = 1;
+						} else {
+							empMainLoop = 0;
+						}
+					}
+					while (empMainLoop) {
+						printf("What do you want to do?\n\t1. Change id.\n\t2. Change name.\n\t3. Change SSN.\n\t4. Change pay.\n\t5. Delete employee.\n\t6. Exit.\n[1, 2, 3, 4, 5, or 6]: ");
+						memset(buf, '\0', sizeof(buf)); // Clears buffer
+						scanf("%[^\n]%*c", &buf);
+						if (buf[0] == '1') {
+							printf("Enter the employee's new id: ");
+							memset(emp, '\0', sizeof(emp)); // Clears buffer
+							scanf("%[^\n]%*c", &emp);
+						} else if (buf[0] == '2') {
+							printf("Enter the employee's new name: ");
+							memset(empName, '\0', sizeof(empName)); // Clears buffer
+							scanf("%[^\n]%*c", &empName);
+						} else if (buf[0] == '3') {
+							printf("Enter the employee's new SSN: ");
+							memset(empSSN, '\0', sizeof(empSSN)); // Clears buffer
+							scanf("%[^\n]%*c", &empSSN);
+						} else if (buf[0] == '4') {
+							empPayLoop = 1;
+							while (empPayLoop) {
+								printf("Enter the employee's new pay (USD): ");
+								memset(empPayStr, '\0', sizeof(empPayStr)); // Clears buffer
+								scanf("%[^\n]%*c", &empPayStr);
+								empPay = strtof(empPayStr, &empPayStrEndPtr);
+								if (*empPayStrEndPtr == '\0') {
+									employee->pay = empPay;
+									empPayLoop = 0;
+								} else {
+									printf("\"%s\" was not recognized! ", empPayStrEndPtr);
+								}
+								printf("Enter the employee's new type [S(alary)/H(ourly)]: ");
+								memset(empType, '\0', sizeof(empType)); // Clears buffer
+								scanf("%[^\n]%*c", &empType);
+								if (empType[0] == 'S' || empType[0] == 's') {
+									employee->type = SALARY;
+								} else if (empType[0] == 'H' || empType[0] == 'h') {
+									employee->type = HOURLY;
+								}
+							}
+						} else if (buf[0] == '5') {
+							printf("Deleting employee...\n");
+							if (deleteEmployee(&account, employee->id)) {
+								empLoop = 0;
+							} else {
+								printf("Failed to delete employee!");
+							}
+						} else if (buf[0] == '6') {
+							empLoop = 0;
 						}
 					}
 				}
