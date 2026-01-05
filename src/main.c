@@ -305,6 +305,7 @@ int main(int argc, char **argv) {
 							printf("id:\t\t%s\nname:\t\t%s\nSSN:\t\t%s\npay:\t\t%f\nActive?:\t\t%s\n", employee->id, employee->name, employee->SSN, employee->pay, employee->active ? "Yes" : "No");
 						} else if (buf[0] == '7') {
 							printf("Setting employee to %sactive...", employee->active ? "" : "in");
+							employee->active = employee->active ? 0 : 1; // Toggles active
 						} else if (buf[0] == '8') {
 							empMainLoop = 0;
 						}
