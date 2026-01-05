@@ -15,6 +15,18 @@ struct Employee {
 	char address[128];
 	float pay;
 	enum EmployeeType type;
+	float addlDeductions;
+	uint8_t active;
+	float YTD;
+	float OTYTD;
+	float grossYTD;
+	float netYTD;
+	float fedYTD;
+	float SSYTD;
+	float medYTD;
+	float stateYTD;
+	float addlYTD;
+	float deductYTD;
 };
 
 struct Account {
@@ -25,6 +37,7 @@ struct Account {
 	struct Employee employees[128];
 	uint8_t employeeCount;
 	uint8_t saveCount;
+
 };
 
 void getStr(char* buffer) {
@@ -45,7 +58,7 @@ struct Employee* getEmployee(struct Account* account, char* id) {
 
 // Similar to getEmployee()
 uint8_t deleteEmployee(struct Account* account, char* id) {
-	uint8_t index = account->employeeCount; // Sets to unreachable value
+	uint8_t index = account->employeeCount + 1; // Sets to unreachable value
 	for (int i=0;i<account->employeeCount;i++) {
 		if (!strcmp(account->employees[i].id, id)) {
 			index = i;
@@ -54,7 +67,8 @@ uint8_t deleteEmployee(struct Account* account, char* id) {
 			account->employees[i-1] = account->employees[i];
 		}
 	}
-	return index<account->employeeCount; // Checks if index is the unreachable value or not
+	account->employeeCount--;
+	return index<account->employeeCount+1; // Checks if index is the unreachable value or not
 }
 
 uint16_t getStrLen(char* string) {
@@ -275,8 +289,6 @@ int main(int argc, char **argv) {
 							}
 						} else if (buf[0] == '6') {
 							printf("id:\t\t%s\nname:\t\t%s\nSSN:\t\t%s\npay:\t\t%f\n", employee->id, employee->name, employee->SSN, employee->pay);
-							printf("Press enter...");
-							getStr(buf);
 						} else if (buf[0] == '7') {
 							empMainLoop = 0;
 						}
@@ -284,7 +296,7 @@ int main(int argc, char **argv) {
 				}
 
 			} else if (buf[0] == '4') {
-				printf("%i\n", account.saveCount);
+				printf("%d\n", account.saveCount);
 				printf("%s\n", account.name);
 			} else if (buf[0] == '5') {
 				printf("Saving account...\n");
