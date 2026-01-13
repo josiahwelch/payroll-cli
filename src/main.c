@@ -3,6 +3,11 @@
 #include <stdint.h>
 #include <string.h>
 
+const float fedRate = 0.04;
+const float SSRate = 0.03;
+const float medRate = 0.02;
+const float stateRate = 0.01;
+
 enum EmployeeType {
 	SALARY,
 	HOURLY
@@ -41,7 +46,7 @@ struct Account {
 };
 
 struct Paystub {
-	char id[16]; // Equal to id of employee from where the payroll batch originates
+	char empId[16]; // Equal to id of employee from where the payroll batch originates
 	char address[128];
 	char checkDate[32];
 	char acctEIN[16];
@@ -68,9 +73,12 @@ struct Paystub {
 };
 
 struct PayrollBatch {
-	char accountId[16]; // Equal to id of account from where the payroll batch originates
+	char acctId[16]; // Equal to id of account from where the payroll batch originates
+	char id[16];
+	char checkDate[32];
 	char payPeriod[64];
 	struct Paystub paystubs[128];
+	uint8_t paystubCount;
 };
 
 void getStr(char* buffer, size_t sizeofBuf) {
@@ -176,6 +184,11 @@ int main(int argc, char **argv) {
 	float empHours;
 	float empSpecNetMod;
 
+	char payrollBatchId;
+	char checkDate[32];
+	char payPeriod[64];
+	struct PayrollBatch payrollBatch;
+
 	char buf[8];
 
 	struct Employee notNULL;
@@ -239,11 +252,39 @@ int main(int argc, char **argv) {
 			printf("What do you want to do?\n\t1. Add new payroll batch.\n\t2. Edit/print old payroll sheets.\n\t3. Edit/add employees.\n\t4. View account info.\n\t5. Save and exit.\n\t6. Exit without saving.\n[1, 2, 3, 4, 5, or 6]: ");
 			getStr(buf, sizeof(buf));
 			if (buf[0] == '1') {
+				printf("Enter the id of the new payroll batch: ");
+				getStr(payrollBatchId);
+				strcpy(payrollBatch.id, payrollBatchId);
+				printf("Enter the check date (MM-DD-YYYY): ");
+				getStr(checkDate);
+				strcpy(payrollBatch.checkDate, checkDate);
+				printf("Enter the pay period (MM-DD-YYYY to MM-DD-YYYY)")
+				getStr(payPeriod); 
+				strcpy(payrollBatch.payPeriod, payPeriod);
+				payrollBatch.paystubCount = 0;
 				for (int i=0;i<account.employeeCount;i++) {
 					if (account.employees[i].active) {
+						strcpy(payrollBatch.paystubs[payrollBatch.paystubCount].empId, account.employees[i].id);
+						strcpy(payrollBatch.paystubs[payrollBatch.paystubCount].address, account.employees[i].address);
+						strcpy(payrollBatch.paystubs[payrollBatch.paystubCount].checkDate, checkDate);
+						strcpy(payrollBatch.paystubs[payrollBatch.paystubCount].acctEIN, account.EIN);
+						strcpy(payrollBatch.paystubs[payrollBatch.paystubCount].payPeriod, payPeriod);
+						payrollBatch.paystubs[payrollBatch.paystubCount].exceptions = account.employees[i].exceptions;
+						strcpy(payrollBatch.paystubs[payrollBatch.paystubCount].SSN, account.employees[i].SSN);
+						// Hours must be retrieved before these fields
 						printf("%s: %s's hours: ", account.employees[i].id, account.employees[i].name);
-						getFlt(empHours);
+						payrollBatch.paystubs[payrollBatch.paystubCount].hours = hours > 40 ? 40 : empHours;
+						payrollBatch.paystubs[payrollBatch.paystubCount].OTHours = hours > 40 ? empHours % 40 : 0;
+						payrollBatch.paystubs[payrollBatch.paystubCount].current = (empHours > 40 ? 40 : empHours) * employees[i].pay;
+						payrollBatch.paystubs[payrollBatch.paystubCount].OTCurrent = (empHours > 40 ? empHours % 40 : 0) * employees[i].pay;
+						getFlt(&empHours);
 
+						printf("%s: %s's additional net pay (USD, enter '0' for none, prepend with '-' for an after-tax deduction): ", account.employees[i].id, account.employees[i].name);
+						getFlt(&empSpecNetMod);
+						payrollBatch.paystubs[payrollBatch.paystubCount].netPay = empSpecNetMod;
+
+					}
+				}
 			} else if (buf[0] == '2') {
 			} else if (buf[0] == '3') {
 				empLoop = 1;
